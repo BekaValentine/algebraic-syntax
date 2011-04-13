@@ -12,8 +12,14 @@ id x = x
 const : ∀ {m n} {X : Set m} {Y : Set n} → X → Y → X
 const x _ = x
 
+const′ : ∀ {n} {X Y : Set n} → X → Y → X
+const′ = const
+
 const2 : ∀ {l m n} {X : Set l} {Y : Set m} {Z : Set n} → X → Y → Z → X
 const2 x _ _ = x
+
+const2′ : ∀ {n} {X Y Z : Set n} → X → Y → Z → X
+const2′ = const2
 
 infixl 12 _∘_
 _∘_ : ∀ {l m n} {X : Set l} {Y : Set m} {Z : Set n} → (Y → Z) → (X → Y) → (X → Z)

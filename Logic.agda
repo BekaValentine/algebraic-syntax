@@ -32,3 +32,22 @@ X ⊕ Y = (X ∧ ¬ Y) ∨ (¬ X ∧ Y)
 
 data ∃ {n} (X : Set n) (P : X → Set n) : Set n where
   exists : (x : X) → P x → ∃ X P
+
+∃-witness : ∀ {n} {X : Set n} {P : X → Set n} → ∃ X P → X
+∃-witness (exists x _) = x
+
+∃-proof : ∀ {n} {X : Set n} {P : X → Set n} → (ex : ∃ X P) → P (∃-witness ex)
+∃-proof (exists _ p) = p
+
+infixr 9 _↔_
+_↔_ : ∀ {n} → Set n → Set n → Set n
+X ↔ Y = (X → Y) ∧ (Y → X)
+
+data Non-Empty {n} (X : Set n) : Set n where
+  non-empty : X → Non-Empty X
+
+ne-witness : ∀ {n} {X : Set n} → Non-Empty X → X
+ne-witness (non-empty x) = x
+
+Empty : ∀ {n} (X : Set n) → Set n
+Empty X = ¬(Non-Empty X)

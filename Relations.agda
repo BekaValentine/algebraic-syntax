@@ -33,23 +33,35 @@ REL X Y ℓ = X → Y → Set ℓ
 Rel : ∀ {n} → Set n → (ℓ : ℕ) → Set (n ⊔ suc ℓ)
 Rel X ℓ = X → X → Set ℓ
 
-Reflexive : ∀ {ℓ} {X : Set ℓ} → Rel X ℓ → Set ℓ
+Reflexive : ∀ {ℓ} {X : Set ℓ} → Rel X ℓ → Set _
 Reflexive _~_ = ∀ {x} → x ~ x
 
-Irreflexive : ∀ {ℓ} {X : Set ℓ} → Rel X ℓ → Set ℓ
+Irreflexive : ∀ {ℓ} {X : Set ℓ} → Rel X ℓ → Set _
 Irreflexive _~_ = ¬(Reflexive _~_)
 
-Transitive : ∀ {ℓ} {X : Set ℓ} → Rel X ℓ → Set ℓ
+Transitive : ∀ {ℓ} {X : Set ℓ} → Rel X ℓ → Set _
 Transitive _~_ = ∀ {x y z} → (x ~ y) ∧ (y ~ z) → x ~ z
 
-Asymmetric : ∀ {ℓ} {X : Set ℓ} → Rel X ℓ → Set ℓ
+Asymmetric : ∀ {ℓ} {X : Set ℓ} → Rel X ℓ → Set _
 Asymmetric _~_ = ∀ {x y} → ¬((x ~ y) ∧ (y ~ x))
 
-Antisymmetric : ∀ {ℓ} {X : Set ℓ} → Rel X ℓ → Set ℓ
+Antisymmetric : ∀ {ℓ} {X : Set ℓ} → Rel X ℓ → Set _
 Antisymmetric _~_ = ∀ {x y} → (x ~ y) ∧ (y ~ x) → x == y
 
-Total : ∀ {ℓ} {X : Set ℓ} → Rel X ℓ → Set ℓ
+Total : ∀ {ℓ} {X : Set ℓ} → Rel X ℓ → Set _
 Total _~_ = ∀ {x y} → (x ~ y) ∨ (y ~ x)
 
-Trichotomous : ∀ {ℓ} {X : Set ℓ} → Rel X ℓ → Set ℓ
+Trichotomous : ∀ {ℓ} {X : Set ℓ} → Rel X ℓ → Set _
 Trichotomous _~_ = ∀ {x y} → x ~ y ⊕ y ~ x ⊕ x == y
+
+_⇒_ : ∀ {ℓ} {X Y : Set ℓ} → REL X Y ℓ → REL X Y ℓ → Set _
+p ⇒ q = ∀ {x y} → p x y → q x y
+
+_∩_ : ∀ {ℓ} {X Y : Set ℓ} → REL X Y ℓ → REL X Y ℓ → Set _
+_∩_ {_} {X} {Y} p q = ∃ X (λ x → ∃ Y (λ y → p x y ∧ q x y))
+
+_⇔_ : ∀ {ℓ} {X Y : Set ℓ} → REL X Y ℓ → REL X Y ℓ → Set _
+p ⇔ q = (p ⇒ q) ∧ (q ⇒ p)
+
+_⊞_ : ∀ {ℓ} {X Y : Set ℓ} → REL X Y ℓ → REL X Y ℓ → Set _
+p ⊞ q = ∀ {x y} → p x y ⊕ q x y
