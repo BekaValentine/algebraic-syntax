@@ -35,7 +35,7 @@ record LinearOrder ℓ : Set (suc ℓ) where
     isLinearOrder : IsLinearOrder (digraph carrier _<_)
 
 IsTree : ∀ {n} → Digraph n → Set n
-IsTree (digraph X _<_) = ∃ X (λ x → (y : X) → x == y ∨ x < y)
+IsTree (digraph X _<_) = Transitive _<_ ∧ Irreflexive _<_ ∧ (∃ X (λ x → (y : X) → x == y ∨ x < y))
 
 record Tree ℓ : Set (suc ℓ) where
   constructor tree
@@ -45,7 +45,7 @@ record Tree ℓ : Set (suc ℓ) where
     isTree : IsTree (digraph carrier _<_)
 
 unit-tree : ∀ {n} → Tree n
-unit-tree {n} = tree One (const2 ⊥) (exists * (const′ (inl (refl *))))
+unit-tree {n} = tree One (const2 ⊥) ((λ {x} {y} {z} → fst) , (λ f → f {*}) , exists * (const′ (inl (refl *))))
 
 
 imdom : ∀ {n} → (t : Tree n) → Tree.carrier t → Tree.carrier t → Set n

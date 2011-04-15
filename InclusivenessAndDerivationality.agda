@@ -49,32 +49,24 @@ lemma-Preserves₁→DerivesFrom₁ _~_ carrier inj rel (p0 , p1) = ((λ {x} {y}
 
 
 
--- inclusiveness of properties of structured sets
+-- inclusiveness of properties of pointed structured sets
 Preserves₂ : ∀ {n} {T : Set (suc n)} {X Y : T} {R : Set n}
              → (_~_ : T → T → T)
              → (carrier : T → Set n)
              → (inj : carrier X + carrier Y → carrier (X ~ Y))
              → (fun : (Z : T) → carrier Z → R)
+             → (point : (Z : T) → carrier Z)
              → Set n
-Preserves₂ {_} {_} {X} {Y} _~_ carrier inj fun = (∀ {x : carrier X} → fun X x == fun (X ~ Y) (inj (inl x))) ∧
-                                                 (∀ {x : carrier Y} → fun Y x == fun (X ~ Y) (inj (inr x)))
+Preserves₂ {_} {_} {X} {Y} _~_ carrier inj fun point = (fun X (point X) == fun (X ~ Y) (inj (inl (point X)))) ∧
+                                                       (fun Y (point Y) == fun (X ~ Y) (inj (inr (point Y))))
 
--- derivationality of properties of structured sets
+-- derivationality of properties of pointed structured sets
 DerivesFrom₂ : ∀ {n} {T : Set (suc n)} {X Y : T} {R : Set n}
                → (_~_ : T → T → T)
                → (carrier : T → Set n)
                → (inj : carrier X + carrier Y → carrier (X ~ Y))
-               → (postfun : R → R)
+               → (postfun : R → R → R)
                → (prefun : (Z : T) → carrier Z → R)
+               → (point : (Z : T) → carrier Z)
                → Set n
-DerivesFrom₂ {_} {_} {X} {Y} _~_ carrier inj postfun prefun = (∀ {x : carrier X} → postfun (prefun X x) == prefun (X ~ Y) (inj (inl x))) ∧
-                                                              (∀ {x : carrier Y} → postfun (prefun Y x) == prefun (X ~ Y) (inj (inr x)))
-
-lemma-Preserves₂→DerivesFrom₂ : ∀ {n} {T : Set (suc n)} {X Y : T} {R : Set n}
-                                → (_~_ : T → T → T)
-                                → (carrier : T → Set n)
-                                → (inj : carrier X + carrier Y → carrier (X ~ Y))
-                                → (fun : (Z : T) → carrier Z → R)
-                                → Preserves₂ {n} {T} {X} {Y} _~_ carrier inj fun
-                                → DerivesFrom₂ {n} {T} {X} {Y} _~_ carrier inj id fun
-lemma-Preserves₂→DerivesFrom₂ _~_ carrier inj fun = id
+DerivesFrom₂ {_} {_} {X} {Y} _~_ carrier inj postfun prefun point = postfun (prefun X (point X)) (prefun Y (point Y)) == prefun (X ~ Y) (point (X ~ Y))
