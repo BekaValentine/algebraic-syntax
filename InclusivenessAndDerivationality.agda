@@ -53,20 +53,32 @@ lemma-Preserves₁→DerivesFrom₁ _~_ carrier inj rel (p0 , p1) = ((λ {x} {y}
 Preserves₂ : ∀ {n} {T : Set (suc n)} {X Y : T} {R : Set n}
              → (_~_ : T → T → T)
              → (carrier : T → Set n)
-             → (inj : carrier X + carrier Y → carrier (X ~ Y))
              → (fun : (Z : T) → carrier Z → R)
+             → (comb : R × R → R)
+             → (acc : R → R × R)
              → (point : (Z : T) → carrier Z)
              → Set n
-Preserves₂ {_} {_} {X} {Y} _~_ carrier inj fun point = (fun X (point X) == fun (X ~ Y) (inj (inl (point X)))) ∧
-                                                       (fun Y (point Y) == fun (X ~ Y) (inj (inr (point Y))))
+Preserves₂ {_} {_} {X} {Y} _~_ carrier fun comb acc point = (comb (fun X (point X) , fun Y (point Y)) == fun (X ~ Y) (point (X ~ Y))) ∧
+                                                            ((fun X (point X) , fun Y (point Y)) == acc (fun (X ~ Y) (point (X ~ Y))))
 
 -- derivationality of properties of pointed structured sets
 DerivesFrom₂ : ∀ {n} {T : Set (suc n)} {X Y : T} {R : Set n}
                → (_~_ : T → T → T)
                → (carrier : T → Set n)
-               → (inj : carrier X + carrier Y → carrier (X ~ Y))
-               → (postfun : R → R → R)
-               → (prefun : (Z : T) → carrier Z → R)
+               → (fun : (Z : T) → carrier Z → R)
+               → (comb : R × R → R)
                → (point : (Z : T) → carrier Z)
                → Set n
-DerivesFrom₂ {_} {_} {X} {Y} _~_ carrier inj postfun prefun point = postfun (prefun X (point X)) (prefun Y (point Y)) == prefun (X ~ Y) (point (X ~ Y))
+DerivesFrom₂ {_} {_} {X} {Y} _~_ carrier fun comb point = comb ((fun X (point X)) , (fun Y (point Y))) == fun (X ~ Y) (point (X ~ Y))
+
+lemma-Preserves₂→DerivesFrom₂ : ∀ {n} {T : Set (suc n)} {X Y : T} {R : Set n}
+                                → (_~_ : T → T → T)
+                                → (carrier : T → Set n)
+                                → (fun : (Z : T) → carrier Z → R)
+                                → (comb : R × R → R)
+                                → (acc : R → R × R)
+                                → (point : (Z : T) → carrier Z)
+                                → Preserves₂ {n} {T} {X} {Y} _~_ carrier fun comb acc point
+                                → DerivesFrom₂ {n} {T} {X} {Y} _~_ carrier fun comb point
+--lemma-Preserves₂→DerivesFrom₂ _~_ carrier fun comb acc point (p0 , p1) = p0
+lemma-Preserves₂→DerivesFrom₂ _~_ carrier fun comb acc point = fst
