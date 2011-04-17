@@ -49,7 +49,7 @@ lemma-Preserves₁→DerivesFrom₁ _~_ carrier inj rel (p0 , p1) = ((λ {x} {y}
 
 
 
--- inclusiveness of properties of pointed structured sets
+-- inclusiveness of properties of pointed sets
 Preserves₂ : ∀ {n} {T : Set (suc n)} {X Y : T} {R : Set n}
              → (_~_ : T → T → T)
              → (carrier : T → Set n)
@@ -61,7 +61,7 @@ Preserves₂ : ∀ {n} {T : Set (suc n)} {X Y : T} {R : Set n}
 Preserves₂ {_} {_} {X} {Y} _~_ carrier fun comb acc point = (comb (fun X (point X) , fun Y (point Y)) == fun (X ~ Y) (point (X ~ Y))) ∧
                                                             ((fun X (point X) , fun Y (point Y)) == acc (fun (X ~ Y) (point (X ~ Y))))
 
--- derivationality of properties of pointed structured sets
+-- derivationality of properties of pointed sets
 DerivesFrom₂ : ∀ {n} {T : Set (suc n)} {X Y : T} {R : Set n}
                → (_~_ : T → T → T)
                → (carrier : T → Set n)

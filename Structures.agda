@@ -49,7 +49,7 @@ unit-tree {n} = tree One (const2 ⊥) ((λ {x} {y} {z} → fst) , (λ f → f {*
 
 
 imdom : ∀ {n} → (t : Tree n) → Tree.carrier t → Tree.carrier t → Set n
-imdom (tree X _<_ _) x y = ¬(x == y) ∧ x < y ∧ ¬(∃ X (λ z → x < z ∧ z < y))
+imdom (tree X _<_ _) x y = ¬(x == y) ∧ x < y ∧ (∀ {z : X} → ¬(x < z ∧ z < y))
 
 IsSingleDominanceTree : ∀ {n} → (t : Tree n) → Set n
 IsSingleDominanceTree t = ∀ {x y z : Tree.carrier t} → imdom t x z ∧ imdom t y z → x == y

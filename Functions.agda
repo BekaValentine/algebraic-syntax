@@ -48,18 +48,18 @@ fst (x , _) = x
 snd : ∀ {n} {X Y : Set n} → X × Y → Y
 snd (_ , y) = y
 
-curry : ∀ {m n} {X : Set m} {Y : Set m} {Z : Set n} → (X × Y → Z) → (X → Y → Z)
+curry : ∀ {n} {X Y Z : Set n} → (X × Y → Z) → (X → Y → Z)
 curry f x y = f (x , y)
 
-uncurry : ∀ {m n} {X Y : Set m} {Z : Set n} → (X → Y → Z) → (X × Y → Z)
+uncurry : ∀ {n} {X Y Z : Set n} → (X → Y → Z) → (X × Y → Z)
 uncurry f (x , y) = f x y
 
 infixr 11 _▵_
-_▵_ : ∀ {m n} {X : Set m} {Y Y′ : Set n} → (X → Y) → (X → Y′) → (X → Y × Y′)
+_▵_ : ∀ {n} {X Y Y′ : Set n} → (X → Y) → (X → Y′) → (X → Y × Y′)
 (f ▵ g ) x =  (f x , g x)
 
 infixr 11 _×′_
-_×′_ : ∀ {m n} {X X′ : Set m} {Y Y′ : Set n} → (X → Y) → (X′ → Y′) → (X × X′ → Y × Y′)
+_×′_ : ∀ {n} {X X′ Y Y′ : Set n} → (X → Y) → (X′ → Y′) → (X × X′ → Y × Y′)
 (f ×′ g) (x , y) = (f x , g y)
 
 
@@ -69,12 +69,12 @@ data _+_ {n} (X Y : Set n) : Set n where
   inr : Y → X + Y
 
 infixr 10 _▿_
-_▿_ : ∀ {m n} {X X′ : Set m} {Y : Set n} → (X → Y) → (X′ → Y) → (X + X′ → Y)
+_▿_ : ∀ {n} {X X′ Y : Set n} → (X → Y) → (X′ → Y) → (X + X′ → Y)
 (f ▿ g) (inl x) = f x
 (f ▿ g) (inr y) = g y
 
 infixr 10 _+′_
-_+′_ : ∀ {m n} {X X′ : Set m} {Y Y′ : Set n} → (X → Y) → (X′ → Y′) → (X + X′ → Y + Y′)
+_+′_ : ∀ {n} {X X′ Y Y′ : Set n} → (X → Y) → (X′ → Y′) → (X + X′ → Y + Y′)
 (f +′ g) (inl x) = inl (f x)
 (f +′ g) (inr y) = inr (g y)
 
