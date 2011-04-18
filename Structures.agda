@@ -45,7 +45,7 @@ record Tree ℓ : Set (suc ℓ) where
     isTree : IsTree (digraph carrier _<_)
 
 unit-tree : ∀ {n} → Tree n
-unit-tree {n} = tree One (const2 ⊥) ((λ {x} {y} {z} → fst) , (λ f → f {*}) , exists * (const′ (inl (refl *))))
+unit-tree {n} = tree One (const2 ⊥) ((λ {x} {y} {z} → fst) , (λ f → f {*}) , exists′ * (const′ (inl (refl *))))
 
 
 imdom : ∀ {n} → (t : Tree n) → Tree.carrier t → Tree.carrier t → Set n

@@ -131,12 +131,26 @@ _↑_ (sdtree X _<_ (t0 , i0 , p0) sd0) (sdtree Y _<′_ (t1 , i1 , p1) sd1) = l
                                                                                   (lem-sd-comb _<_ ((λ {x} {y} {z} → t0 {x} {y} {z}) , i0 , p0) sd0
                                                                                                _<′_ ((λ {x} {y} {z} → t1 {x} {y} {z}) , i1 , p1) sd1
                                                                                                t2)
-{-
-lem-cc : ∀ {ℓ} {X Y : Set ℓ}
-         → (_cc_ : Rel X ℓ)
-         → IsCCommandRel _cc_
-         → (_cc′_ : Rel Y ℓ)
-         → IsCCommandRel _cc′_
-         → ∃ (Rel X ℓ → Rel Y ℓ → Rel (One + X + Y) ℓ) (λ f → IsCCommandRel (f _cc_ _cc′_))
-lem-cc _cc_ p0 _cc′_ p1 = ?
--}
+
+
+cc-comb : ∀ {ℓ}
+          → (sd0 : SingleDominanceTree ℓ)
+          → (sd1 : SingleDominanceTree ℓ)
+          → Rel (SingleDominanceTree.carrier sd0) ℓ
+          → Rel (SingleDominanceTree.carrier sd1) ℓ
+          → Rel (SingleDominanceTree.carrier (sd0 ↑ sd1)) ℓ
+cc-comb (sdtree X _<_ t0 sd0) (sdtree Y _<′_ t1 sd1) _cc_ _cc′_ x y with SingleDominanceTree.carrier ((sdtree X _<_ t0 sd0) ↑ (sdtree Y _<′_ t1 sd1))
+... | _ = {!!}
+
+lem-cc : ∀ {ℓ}
+         → (sd0 : SingleDominanceTree ℓ)
+         → (_cc_ : Rel (SingleDominanceTree.carrier sd0) ℓ)
+         → IsCCommandRel sd0 _cc_
+         → (sd1 : SingleDominanceTree ℓ)
+         → (_cc′_ : Rel (SingleDominanceTree.carrier sd1) ℓ)
+         → IsCCommandRel sd1 _cc′_
+         → ∃ (Rel (SingleDominanceTree.carrier sd0) ℓ
+               → Rel (SingleDominanceTree.carrier sd1) ℓ
+               → Rel (SingleDominanceTree.carrier (sd0 ↑ sd1)) ℓ)
+             (λ f → IsCCommandRel (sd0 ↑ sd1) (f _cc_ _cc′_))
+lem-cc sd0 _cc_ p0 sd1 _cc′_ p1 = exists (cc-comb sd0 sd1) (λ {x} {y} → ({!!} , {!!}))

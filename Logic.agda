@@ -30,8 +30,11 @@ infixr 10 _⊕_
 _⊕_ : ∀ {n} → Set n → Set n → Set n
 X ⊕ Y = (X ∧ ¬ Y) ∨ (¬ X ∧ Y)
 
-data ∃ {n} (X : Set n) (P : X → Set n) : Set n where
+data ∃ {m n} (X : Set m) (P : X → Set n) : Set (m ⊔ n) where
   exists : (x : X) → P x → ∃ X P
+
+exists′ : ∀ {n} {X : Set n} {P : X → Set n} → (x : X) → P x → ∃ X P
+exists′ = exists
 
 ∃-witness : ∀ {n} {X : Set n} {P : X → Set n} → ∃ X P → X
 ∃-witness (exists x _) = x
