@@ -201,43 +201,41 @@ lem-sd-root sdt0 sdt1 = ((λ {x : SingleDominanceTree.carrier sdt0} → (fl {x} 
         ... | ()
         
 
+
+cc-comb-lem : ∀ {ℓ}
+              → (sdt0 : SingleDominanceTree ℓ)
+              → (_cc_ : Rel (SingleDominanceTree.carrier sdt0) ℓ)
+              → (p0 : IsCCommandRel sdt0 _cc_)
+              → (sdt1 : SingleDominanceTree ℓ)
+              → (_cc′_ : Rel (SingleDominanceTree.carrier sdt1) ℓ)
+              → (p1 : IsCCommandRel sdt1 _cc′_)
+              → ∃ (Rel (SingleDominanceTree.carrier (sdt0 ↑ sdt1)) ℓ)
+                  (IsCCommandRel (sdt0 ↑ sdt1))
+cc-comb-lem {ℓ} sdt0 _cc_ p0 sdt1 _cc′_ p1 = exists _cc′′_ (λ {x} {y} → ccp {x} {y})
+  where _cc′′_ : Rel (SingleDominanceTree.carrier (sdt0 ↑ sdt1)) ℓ
+        x cc′′ y with sdt0 | sdt1
+        ... | sdtree X _<_ t0 sd0 | sdtree Y _<′_ t1 sd1 with x | y
+        ... | inl * | inl * = {!!}
+        ... | inl * | inr (inl y0) = {!!}
+        ... | inl * | inr (inr y0) = {!!}
+        ... | inr _ | _ = {!!}
+        
+        ccp : IsCCommandRel (sdt0 ↑ sdt1) _cc′′_
+        ccp {x} {y} with sdt0 ↑ sdt1 | sdt0 | sdt1
+        ... | sdtree X _<_ t0 sd0 | sdtree Y _<′_ t1 sd1 | sdtree _ _<′′_ t2 sd2 with x | y
+        ... | inl * | inl * = ({!!} , {!g!})
+          where w : Set ℓ
+                w = ?
+                
+                g : ¬ ⊥ × ¬ ⊥ ×
+                    ∃ (One + X + Y) (λ z → imdom (tree (One + X + Y) _<′′_ t2) z (inl *) ∧ (z <′′ inl *))
+                    → w
+                g = {!!}
+        ... | inl * | inr (inl y0) = {!!}
+        ... | inl * | inr (inr y0) = {!!}
+        ... | inr _ | _ = {!!}
+
 {-
-
-postulate ℓ : ℕ
-postulate X Y : Set ℓ
-postulate _<_ : Rel X ℓ
-postulate t0 : IsTree (digraph X _<_)
-postulate sd0 : IsSingleDominanceTree (tree X _<_ t0)
-postulate _<′_ : Rel Y ℓ
-postulate t1 : IsTree (digraph Y _<′_)
-postulate sd1 : IsSingleDominanceTree (tree Y _<′_ t1)
-
-sdt0 : SingleDominanceTree ℓ
-sdt0 = sdtree X _<_ t0 sd0
-
-postulate _cc_ : Rel X ℓ
-postulate p0 : IsCCommandRel sdt0 _cc_
-
-sdt1 : SingleDominanceTree ℓ
-sdt1 = sdtree Y _<′_ t1 sd1
-
-postulate _cc′_ : Rel Y ℓ
-postulate p1 : IsCCommandRel sdt1 _cc′_
-
-sdt2 : SingleDominanceTree ℓ
-sdt2 = sdt0 ↑ sdt1
-
-car : Set ℓ
-car = SingleDominanceTree.carrier sdt2
-
-_<′′_ : Rel car ℓ
-_<′′_ = SingleDominanceTree._<_ sdt2
-
-t2 : IsTree (digraph car _<′′_)
-t2 = SingleDominanceTree.isTree sdt2
-
-sd2 : IsSingleDominanceTree (tree car _<′′_ t2)
-sd2 = SingleDominanceTree.isSingleDominanceTree sdt2
 
 _cc′′_ : (x y : car) → ∃ (Set ℓ) (λ xccy → xccy ↔
                        ¬(x <′′ y) ∧
@@ -357,5 +355,4 @@ _cc′′_ : (x y : car) → ∃ (Set ℓ) (λ xccy → xccy ↔
         g (a , b , exists (inl *) d) = {!!}
         g (a , b , exists (inr (inl z)) (_ , ()))
         g (a , b , exists (inr (inr z)) d) = {!!}
-
 -}
