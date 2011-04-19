@@ -35,7 +35,7 @@ record LinearOrder ℓ : Set (suc ℓ) where
     isLinearOrder : IsLinearOrder (digraph carrier _<_)
 
 IsTree : ∀ {n} → Digraph n → Set n
-IsTree (digraph X _<_) = Transitive _<_ ∧ Irreflexive _<_ ∧ (∃ X (λ x → (y : X) → x == y ∨ x < y))
+IsTree (digraph X _<_) = Transitive _<_ ∧ Irreflexive _<_ ∧ Asymmetric _<_ ∧ (∃ X (λ x → ∀ (y : X) → x == y ∨ x < y))
 
 record Tree ℓ : Set (suc ℓ) where
   constructor tree
@@ -44,8 +44,16 @@ record Tree ℓ : Set (suc ℓ) where
     _<_ : Rel carrier ℓ
     isTree : IsTree (digraph carrier _<_)
 
+root : ∀ {n} → (t : Tree n) → Tree.carrier t
+root (tree _ _ (_ , _ , _ , exists r _)) = r
+
 unit-tree : ∀ {n} → Tree n
-unit-tree {n} = tree One (const2 ⊥) ((λ {x} {y} {z} → fst) , (λ f → f {*}) , exists′ * (const′ (inl (refl *))))
+unit-tree {n} = tree One (const2 ⊥) ((λ {x} {y} {z} → fst) ,
+                                     (λ {x} → id) ,
+                                     (λ {x} {y} → g {x} {y}) ,
+                                     exists′ * (const′ (inl (refl *))))
+  where g : ∀ {x y : One} → ⊥ × ⊥ → ⊥
+        g (() , ())
 
 
 imdom : ∀ {n} → (t : Tree n) → Tree.carrier t → Tree.carrier t → Set n
@@ -61,6 +69,12 @@ record SingleDominanceTree ℓ : Set (suc ℓ) where
     _<_ : Rel carrier ℓ
     isTree : IsTree (digraph carrier _<_)
     isSingleDominanceTree : IsSingleDominanceTree (tree carrier _<_ isTree)
+
+sdroot : ∀ {n} → (sdt : SingleDominanceTree n) → SingleDominanceTree.carrier sdt
+sdroot (sdtree _ _ (_ , _ , _ , exists r _) _) = r
+
+sd-underlying-tree : ∀ {n} → SingleDominanceTree n → Tree n
+sd-underlying-tree (sdtree X _<_ t sd) = tree X _<_ t
 
 unit-sdtree : ∀ {n} → SingleDominanceTree n
 unit-sdtree = sdtree One (const2 ⊥) (Tree.isTree unit-tree) (const (refl *))

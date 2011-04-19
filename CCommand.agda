@@ -56,7 +56,9 @@ lem-irref-comb : ∀ {ℓ} {X Y : Set ℓ}
                  → (_<′_ : Rel Y ℓ)
                  → Irreflexive _<′_
                  → Irreflexive (comb _<_ _<′_)
-lem-irref-comb _<_ p0 _<′_ p1 p2 = p0 (λ {x} → p2 {inr (inl x)})
+lem-irref-comb _<_ p0 _<′_ p1 {inl *} ()
+lem-irref-comb _<_ p0 _<′_ p1 {inr (inl x)} p = p0 {x} p
+lem-irref-comb _<_ p0 _<′_ p1 {inr (inr x)} p = p1 {x} p
 
 
 lem-rooted-comb : ∀ {ℓ} {X Y : Set ℓ}
@@ -108,16 +110,98 @@ lem-sd-comb _<_ t0 sd0 _<′_ t1 sd1 t2 {inr (inr x)} {inr (inr y)} {inr (inl z)
 lem-sd-comb _<_ t0 sd0 _<′_ t1 sd1 t2 {inr (inr x)} {inr (inr y)} {inr (inr z)} ((p00 , p01 , p02) , (p10 , p11 , p12)) = cong (inr ∘′ inr) (sd1 {x} {y} {z} (((λ x==z → p00 (cong (inr ∘′ inr) x==z)) , p01 , (λ {z′} p → p02 {inr (inr z′)} p)) , ((λ y==z → p10 (cong (inr ∘′ inr) y==z)) , p11 , (λ {z′} p → p12 {inr (inr z′)} p))))
               
 
-_↑_ : ∀ {n} → SingleDominanceTree n → SingleDominanceTree n → SingleDominanceTree n
-_↑_ (sdtree X _<_ (t0 , i0 , p0) sd0) (sdtree Y _<′_ (t1 , i1 , p1) sd1) = let t2 = ((λ {x} {y} {z} p → lem-trans-comb _<_ t0 _<′_ t1 {x} {y} {z} p) ,
-                                                                                    lem-irref-comb _<_ i0 _<′_ i1 ,
-                                                                                    exists (inl *) (lem-rooted-comb _<_ _<′_)) in
-                                                                               sdtree (One + X + Y)
+_↑_ : ∀ {n}
+      → SingleDominanceTree n
+      → SingleDominanceTree n
+      → SingleDominanceTree n
+sdtree X _<_ (t0 , i0 , a0 , p0) sd0 ↑ sdtree Y _<′_ (t1 , i1 , a1 , p1) sd1 = sdtree (One + X + Y)
                                                                                   (comb _<_ _<′_)
                                                                                   t2
-                                                                                  (lem-sd-comb _<_ ((λ {x} {y} {z} → t0 {x} {y} {z}) , i0 , p0) sd0
-                                                                                               _<′_ ((λ {x} {y} {z} → t1 {x} {y} {z}) , i1 , p1) sd1
+                                                                                  (lem-sd-comb _<_ ((λ {x} {y} {z} → t0 {x} {y} {z}) ,
+                                                                                                    (λ {x} → i0 {x}) ,
+                                                                                                    (λ {x} {y} p → a0 {x} {y} p) ,
+                                                                                                    p0) sd0
+                                                                                               _<′_ ((λ {x} {y} {z} → t1 {x} {y} {z}) ,
+                                                                                                     (λ {x} → i1 {x}) ,
+                                                                                                     (λ {x} {y} p → a1 {x} {y} p) ,
+                                                                                                     p1) sd1
                                                                                                t2)
+  where t2 : IsTree (digraph (One + X + Y) (comb  _<_ _<′_))
+        t2 = ((λ {x} {y} {z} p → lem-trans-comb _<_ t0 _<′_ t1 {x} {y} {z} p) ,
+              (λ {x} → lem-irref-comb _<_ i0 _<′_ i1 {x}) ,
+              (λ {x} {y} → h {x} {y}) ,
+              exists (inl *) (lem-rooted-comb _<_ _<′_))
+          where h : ∀ {x y : One + X + Y}
+                    → comb _<_ _<′_ x y ∧ comb _<_ _<′_ y x
+                    → ⊥
+                h {inl *} {inl *} (() , ())
+                h {inl *} {inr _} (_ , ())
+                h {inr (inl _)} {inl *} (() , _)
+                h {inr (inl x)} {inr (inl y)} p = a0 {x} {y} p
+                h {inr (inl _)} {inr (inr _)} (() , ())
+                h {inr (inr _)} {inl *} (() , _)
+                h {inr (inr _)} {inr (inl _)} (() , _)
+                h {inr (inr x)} {inr (inr y)} p = a1 {x} {y} p
+
+lem-sd-root : ∀ {n}
+              → (sdt0 : SingleDominanceTree n)
+              → (sdt1 : SingleDominanceTree n)
+              → (∀ {x : SingleDominanceTree.carrier sdt0}
+                   → x == sdroot sdt0 ↔ imdom (sd-underlying-tree (sdt0 ↑ sdt1)) (sdroot (sdt0 ↑ sdt1)) (inr (inl x))) ∧
+                (∀ {y : SingleDominanceTree.carrier sdt1}
+                   → y == sdroot sdt1 ↔ imdom (sd-underlying-tree (sdt0 ↑ sdt1)) (sdroot (sdt0 ↑ sdt1)) (inr (inr y)))
+lem-sd-root sdt0 sdt1 = ((λ {x : SingleDominanceTree.carrier sdt0} → (fl {x} , fr {x})) ,
+                         (λ {x : SingleDominanceTree.carrier sdt1} → (gl {x} , gr {x})))
+  where fl : ∀ {x : SingleDominanceTree.carrier sdt0}
+             → x == sdroot sdt0
+             → imdom (sd-underlying-tree (sdt0 ↑ sdt1)) (sdroot (sdt0 ↑ sdt1)) (inr (inl x))
+        fl {x} isroot0 with sdt0 | sdt1
+        ... | sdtree X _<_ (t0 , i0 , a0 , exists r0 p0) sd0 | sdtree Y _<′_ t1 sd1 = (uneq-+-inl-inr , tt , λ {z} → h {z})
+          where h : ∀ {z : One + X + Y}
+                    → comb _<_ _<′_ (inl *) z × comb _<_ _<′_ z (inr (inl x))
+                    → ⊥
+                h {inl *} (() , _)
+                h {inr (inl z)} (p , q) = ((λ z0 → a0 {z} {x} (q , subst-==-2 {F = _<_} x z (trans-== isroot0 z0) q))
+                                           ▿
+                                           (λ z0 → a0 {z} {x} (q , subst-== {F = λ x0 → x0 < z} r0 x (comm-== isroot0) z0)))
+                                            (p0 z)
+                h {inr (inr _)} (_ , ())
+        
+        fr : ∀ {x : SingleDominanceTree.carrier sdt0}
+             → imdom (sd-underlying-tree (sdt0 ↑ sdt1)) (sdroot (sdt0 ↑ sdt1)) (inr (inl x))
+             → x == sdroot sdt0
+        fr {x} (a , b , c) with sdt0 | sdt1
+        ... | sdtree X _<_ (t0 , i0 , a0 , exists r0 p0) sd0 | sdtree Y _<′_ t1 sd1 with p0 x
+        ... | inl r0==x = comm-== r0==x
+        ... | inr r0<x with c {inr (inl r0)} (tt , r0<x)
+        ... | ()
+
+        gl : ∀ {x : SingleDominanceTree.carrier sdt1}
+             → x == sdroot sdt1
+             → imdom (sd-underlying-tree (sdt0 ↑ sdt1)) (sdroot (sdt0 ↑ sdt1)) (inr (inr x))
+        gl {x} isroot1 with sdt0 | sdt1
+        ... | sdtree X _<_ t0 sd0 | sdtree Y _<′_ (t1 , i1 , a1 , exists r1 p1) sd1 = (uneq-+-inl-inr , tt , λ {z} → h {z})
+          where h : ∀ {z : One + X + Y}
+                    → comb _<_ _<′_ (inl *) z × comb _<_ _<′_ z (inr (inr x))
+                    → ⊥
+                h {inl *} (() , _)
+                h {inr (inl _)} (_ , ())
+                h {inr (inr z)} (p , q) = ((λ z1 → a1 {z} {x} (q , subst-==-2 {F = _<′_} x z (trans-== isroot1 z1) q))
+                                           ▿
+                                           (λ z1 → a1 {z} {x} (q , subst-== {F = λ x1 → x1 <′ z} r1 x (comm-== isroot1) z1)))
+                                            (p1 z)
+        
+        gr : ∀ {x : SingleDominanceTree.carrier sdt1}
+             → imdom (sd-underlying-tree (sdt0 ↑ sdt1)) (sdroot (sdt0 ↑ sdt1)) (inr (inr x))
+             → x == sdroot sdt1
+        gr {x} (a , b , c) with sdt0 | sdt1
+        ... | sdtree X _<_ t0 sd0 | sdtree Y _<′_ (t1 , i1 , a1 , exists r1 p1) sd1 with p1 x
+        ... | inl r1==x = comm-== r1==x
+        ... | inr r1<′x with c {inr (inr r1)} (tt , r1<′x)
+        ... | ()
+        
+
+{-
 
 postulate ℓ : ℕ
 postulate X Y : Set ℓ
@@ -213,7 +297,7 @@ _cc′′_ : (x y : car) → ∃ (Set ℓ) (λ xccy → xccy ↔
                  ∃ car (λ z → imdom (tree car _<′′_ t2) z (inr (inl x)) ∧ (z <′′ inl *))
         f ()
 
-(inr (inl x)) cc′′ (inr (inl y)) = exists w ({!!} , {!!})
+(inr (inl x)) cc′′ (inr (inl y)) = exists w ({!!} , g)
   where w : Set ℓ
         w = {!!}
         
@@ -221,10 +305,57 @@ _cc′′_ : (x y : car) → ∃ (Set ℓ) (λ xccy → xccy ↔
             ¬(inr (inl y) <′′ inr (inl x)) ∧
             ∃ car (λ z → imdom (tree car _<′′_ t2) z (inr (inl x)) ∧ (z <′′ inr (inl y)))
             → w
-        g (a , b , exists (inl *) ((c , d , e) , f)) = {!!}
+        g (a , b , exists (inl *) (c , d)) = {!!}
         g (a , b , exists (inr (inl z)) ((c , d , e) , f)) = {!!}
         g (_ , _ , exists (inr (inr _)) ((_ , () , _) , _))
 
-(inr (inl x)) cc′′ (inr (inr y)) = {!!}
+(inr (inl x)) cc′′ (inr (inr y)) = exists w ({!!} , g)
+  where w : Set ℓ
+        w = {!!}
+        
+        g : ¬(inr (inl x) <′′ inr (inr y)) ∧
+            ¬(inr (inr y) <′′ inr (inl x)) ∧
+            ∃ car (λ z → imdom (tree car _<′′_ t2) z (inr (inl x)) ∧ (z <′′ inr (inr y)))
+            → w
+        g (a , b , exists (inl *) d) = {!!}
+        g (_ , _ , exists (inr (inl _)) (_ , ()))
+        g (_ , _ , exists (inr (inr _)) ((_ , () , _) , _))
 
-(inr (inr x)) cc′′ y = {!!}
+(inr (inr x)) cc′′ (inl *) = exists ⊥ (f , g)
+  where g : ¬(inr (inr x) <′′ inl *) ∧
+            ¬(inl * <′′ inr (inr x)) ∧
+            ∃ car (λ z → imdom (tree car _<′′_ t2) z (inr (inr x)) ∧ (z <′′ inl *))
+            → ⊥
+        g (_ , _ , exists (inl *) (_ , ()))
+        g (_ , _ , exists (inr _) (_ , ()))
+        
+        f : ⊥ → ¬(inr (inr x) <′′ inl *) ∧
+                 ¬(inl * <′′ inr (inr x)) ∧
+                 ∃ car (λ z → imdom (tree car _<′′_ t2) z (inr (inr x)) ∧ (z <′′ inl *))
+        f ()
+
+(inr (inr x)) cc′′ (inr (inl y)) = exists w ({!!} , g)
+  where w : Set ℓ
+        w = {!!}
+        
+        g : ¬(inr (inr x) <′′ inr (inl y)) ∧
+            ¬(inr (inl y) <′′ inr (inr x)) ∧
+            ∃ car (λ z → imdom (tree car _<′′_ t2) z (inr (inr x)) ∧ z <′′ (inr (inl y)))
+            → w
+        g (a , b , exists (inl *) d) = {!!}
+        g (_ , _ , exists (inr (inl _)) ((_ , () , _) , _))
+        g (_ , _ , exists (inr (inr _)) (_ , ()))
+
+(inr (inr x)) cc′′ (inr (inr y)) = exists w ({!!} , g)
+  where w : Set ℓ
+        w = {!!}
+        
+        g : ¬(inr (inr x) <′′ inr (inr y)) ∧
+                  ¬(inr (inr y) <′′ inr (inr x)) ∧
+            ∃ car (λ z → imdom (tree car _<′′_ t2) z (inr (inr x)) ∧ z <′′ (inr (inr y)))
+            → w
+        g (a , b , exists (inl *) d) = {!!}
+        g (a , b , exists (inr (inl z)) (_ , ()))
+        g (a , b , exists (inr (inr z)) d) = {!!}
+
+-}
