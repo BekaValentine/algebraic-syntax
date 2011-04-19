@@ -39,14 +39,21 @@ flip f x y = f y x
 
 infixr 11 _×_
 infixr 0 _,_
+{-
 data _×_ {n} (X Y : Set n) : Set n where
   _,_ : X → Y → X × Y
-
+-}
+record _×_ {n} (X Y : Set n) : Set n where
+  constructor _,_
+  field
+    fst : X
+    snd : Y
+    
 fst : ∀ {n} {X Y : Set n} → X × Y → X
-fst (x , _) = x
+fst = _×_.fst
 
 snd : ∀ {n} {X Y : Set n} → X × Y → Y
-snd (_ , y) = y
+snd = _×_.snd
 
 curry : ∀ {n} {X Y Z : Set n} → (X × Y → Z) → (X → Y → Z)
 curry f x y = f (x , y)
