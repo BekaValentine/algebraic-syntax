@@ -212,20 +212,20 @@ cc-comb : ∀ {ℓ}
           → (p1 : IsCCommandRel sdt1 _cc′_)
           → Rel (SingleDominanceTree.carrier (sdt0 ↑ sdt1)) ℓ
 cc-comb {ℓ} (sdtree X _<_ t0 sd0) _cc_ p0 (sdtree Y _<′_ t1 sd1) _cc′_ p1 = _cc′′_
-  where _cc′′_ : Rel (One + X + Y) ℓ
+  where open SingleDominanceTree (sdtree X _<_ t0 sd0 ↑ sdtree Y _<′_ t1 sd1) renaming (_<_ to _<′′_ ; isTree to t2)
+        
+        _cc′′_ : Rel (One + X + Y) ℓ
         x cc′′ y = {!!}
         
         p2 : IsCCommandRel (sdtree X _<_ t0 sd0 ↑ sdtree Y _<′_ t1 sd1) _cc′′_
-        p2 {x} {y} with sdtree X _<_ t0 sd0 ↑ sdtree Y _<′_ t1 sd1
-        ... | sdtree _ _<′′_ t2 sd2 with x | y
-        ... | inl * | inl * = ({!!} , {!!})
+        p2 {inl *} {inl *} = ({!!} , {!!})
           where g : ¬ ⊥ × ¬ ⊥ ×
                     ∃ (One + X + Y) (λ z → imdom (tree (One + X + Y) _<′′_ t2) z (inl *) ∧ (z <′′ inl *))
                     → inl * cc′′ inl *
-                g = ?
+                g = {!!}
         
-        ... | inl * | inr _ = ?
-        ... | inr _ | _ = ?
+        p2 {inl *} {inr _} = {!!}
+        p2 {inr _} {_} = {!!}
 
 
 {-
