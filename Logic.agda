@@ -36,10 +36,10 @@ data ∃ {m n} (X : Set m) (P : X → Set n) : Set (m ⊔ n) where
 exists′ : ∀ {n} {X : Set n} {P : X → Set n} → (x : X) → P x → ∃ X P
 exists′ = exists
 
-∃-witness : ∀ {n} {X : Set n} {P : X → Set n} → ∃ X P → X
+∃-witness : ∀ {m n} {X : Set m} {P : X → Set n} → ∃ X P → X
 ∃-witness (exists x _) = x
 
-∃-proof : ∀ {n} {X : Set n} {P : X → Set n} → (ex : ∃ X P) → P (∃-witness ex)
+∃-proof : ∀ {m n} {X : Set m} {P : X → Set n} → (ex : ∃ X P) → P (∃-witness ex)
 ∃-proof (exists _ p) = p
 
 infixr 9 _↔_
