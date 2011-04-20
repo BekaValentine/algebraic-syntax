@@ -221,7 +221,7 @@ cc-comb-lem {ℓ} sdt0 _cc_ p0 sdt1 _cc′_ p1 = exists _cc′′_ (λ {x} {y} �
         ... | inr _ | _ = {!!}
         
         ccp : IsCCommandRel (sdt0 ↑ sdt1) _cc′′_
-        ccp {x} {y} with sdt0 ↑ sdt1 | sdt0 | sdt1
+        ccp {x} {y} with sdt0 | sdt1 | sdt0 ↑ sdt1
         ... | sdtree X _<_ t0 sd0 | sdtree Y _<′_ t1 sd1 | sdtree _ _<′′_ t2 sd2 with x | y
         ... | inl * | inl * = ({!!} , {!g!})
           where w : Set ℓ
