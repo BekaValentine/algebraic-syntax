@@ -212,73 +212,29 @@ cc-comb : ∀ {ℓ}
           → (p1 : IsCCommandRel sdt1 _cc′_)
           → Rel (SingleDominanceTree.carrier (sdt0 ↑ sdt1)) ℓ
 cc-comb {ℓ} (sdtree X _<_ t0 sd0) _cc_ p0 (sdtree Y _<′_ t1 sd1) _cc′_ p1 = _cc′′_
-  where open SingleDominanceTree (sdtree X _<_ t0 sd0 ↑ sdtree Y _<′_ t1 sd1) renaming (_<_ to _<′′_ ; isTree to t2)
+  where sdt2 = sdtree X _<_ t0 sd0 ↑ sdtree Y _<′_ t1 sd1
+        open SingleDominanceTree sdt2 renaming (_<_ to _<′′_ ; isTree to t2)
         
         _cc′′_ : Rel (One + X + Y) ℓ
-        x cc′′ y = {!!}
+        inl * cc′′ inl * = ⊥
+        inl * cc′′ inr _ = {!!}
+        inr _ cc′′ _ = {!!}
         
-        p2 : IsCCommandRel (sdtree X _<_ t0 sd0 ↑ sdtree Y _<′_ t1 sd1) _cc′′_
-        p2 {inl *} {inl *} = ({!!} , {!!})
-          where g : ¬ ⊥ × ¬ ⊥ ×
+        p2 : IsCCommandRel sdt2 _cc′′_
+        p2 {inl *} {inl *} = ({!!} , g)
+          where g : ¬ ⊥ ∧ ¬ ⊥ ∧
                     ∃ (One + X + Y) (λ z → imdom (tree (One + X + Y) _<′′_ t2) z (inl *) ∧ (z <′′ inl *))
                     → inl * cc′′ inl *
-                g = {!!}
+                g (_ , _ , exists (inl *) (_ , ()))
+                g (_ , _ , exists (inr _) (_ , ()))
+                
+                f : inl * cc′′ inl *
+                    → ¬ ⊥ ∧ ¬ ⊥ ∧
+                      ∃ (One + X + Y) (λ z → imdom (tree (One + X + Y) _<′′_ t2) z (inl *) ∧ (z <′′ inl *))
+                f ()
         
         p2 {inl *} {inr _} = {!!}
         p2 {inr _} {_} = {!!}
-
-
-{-
-cc-comb-lem : ∀ {ℓ}
-              → (sdt0 : SingleDominanceTree ℓ)
-              → (_cc_ : Rel (SingleDominanceTree.carrier sdt0) ℓ)
-              → (p0 : IsCCommandRel sdt0 _cc_)
-              → (sdt1 : SingleDominanceTree ℓ)
-              → (_cc′_ : Rel (SingleDominanceTree.carrier sdt1) ℓ)
-              → (p1 : IsCCommandRel sdt1 _cc′_)
-              → ∃ (Rel (SingleDominanceTree.carrier (sdt0 ↑ sdt1)) ℓ)
-                  (IsCCommandRel (sdt0 ↑ sdt1))
-cc-comb-lem {ℓ} sdt0 _cc_ p0 sdt1 _cc′_ p1 = exists {!!} {!!}
-  where _cc′′_ : Rel (SingleDominanceTree.carrier (sdt0 ↑ sdt1)) ℓ
-        x cc′′ y with sdt0 | sdt1
-        ... | sdtree X _<_ t0 sd0 | sdtree Y _<′_ t1 sd1 = {!!}
-        
-        ccp : IsCCommandRel (sdt0 ↑ sdt1) _cc′′_
-        ccp {x} {y} with sdt0 | sdt1 | sdt0 ↑ sdt1
-        ... | sdtree X _<_ t0 sd0 | sdtree Y _<′_ t1 sd1 | sdtree Z _<′′_ t2 sd2 with x | y
-        ... | inl * | inl * = ({!!} , {!g!})
-          where w : Set ℓ
-                w = ?
-                
-                g : ¬ ⊥ × ¬ ⊥ ×
-                    ∃ (One + X + Y) (λ z → imdom (tree (One + X + Y) _<′′_ t2) z (inl *) ∧ (z <′′ inl *))
-                    → w
-                g = {!!}
-        ... | inl * | inr (inl y0) = {!!}
-        ... | inl * | inr (inr y0) = {!!}
-        ... | inr _ | _ = {!!}
--}
-{-
-  where _cc′′_ : Rel (SingleDominanceTree.carrier (sdt0 ↑ sdt1)) ℓ
-        x cc′′ y with sdt0 | sdt1
-        ... | sdtree X _<_ t0 sd0 | sdtree Y _<′_ t1 sd1 = {!!}
--}
-{-
-        ccp {x} {y} with sdt0 | SingleDominanceTree.carrier sdt0  | sdt1
-        ... | sdtree X _<_ t0 sd0 | X' | sdtree Y _<′_ t1 sd1 with x | y
-        ... | inl * | inl * = ({!!} , {!g!})
-          where w : Set ℓ
-                w = ?
-                
-                g : ¬ ⊥ × ¬ ⊥ ×
-                    ∃ (One + X' + Y) (λ z → imdom ? z (inl *) ∧ (? z inl *))
-                    → x cc′′ y
-                g = {!!}
-        ... | inl * | inr (inl y0) = {!!}
-        ... | inl * | inr (inr y0) = {!!}
-        ... | inr _ | _ = {!!}
--}
-
 
 
 {-
