@@ -41,7 +41,7 @@ cc-comb {ℓ} (sdtree X r0 _<_ t0 sd0) _cc_ p0 (sdtree Y r1 _<′_ t1 sd1) _cc�
         inl * cc′′ inr (inl y) = ⊥
         inl * cc′′ inr (inr y) = ⊥
         inr (inl x) cc′′ inl * = ⊥
-        inr (inl x) cc′′ inr (inl y) = {!!}
+        inr (inl x) cc′′ inr (inl y) = x cc y
         inr (inl x) cc′′ inr (inr y) = {!!}
         inr (inr x) cc′′ inl * = {!!}
         inr (inr x) cc′′ inr (inl y) = {!!}
@@ -122,10 +122,16 @@ cc-comb {ℓ} (sdtree X r0 _<_ t0 sd0) _cc_ p0 (sdtree Y r1 _<′_ t1 sd1) _cc�
                 g (neq , a , b , exists (inl *) ((c , d , e) , f)) with snd (fst rootedness {x})
                                                                             (uneq-+-inl-inr , tt , λ {z} → e {z})
                 ... | x==r0 with rt0 {y}
-                ... | inl r0==y with neq (cong (inr ∘ inl) (trans-== x==r0 r0==y))
+                g (neq , a , b , exists (inl *) ((c , d , e) , f)) | x==r0 | inl r0==y with neq (cong (inr ∘ inl) (trans-== x==r0 r0==y))
                 ... | ()
-                ... | inr r0<y = ?
-                g (neq , a , b , exists (inr (inl z)) ((c , d , e) , f)) = {!!}
+                g (neq , a , b , exists (inl *) ((c , d , e) , f)) | x==r0 | inr r0<y with a (subst-== {F = λ r0 → r0 < y} r0 x (comm-== x==r0) r0<y)
+                ... | ()
+                g (neq , a , b , exists (inr (inl z)) ((c , d , e) , f)) = snd (p0 {x} {y}) (neq ∘′ cong inr ∘′ cong inl ,
+                                                                                             a , b ,
+                                                                                             exists z ((c ∘′ cong inr ∘′ cong inl ,
+                                                                                                        d ,
+                                                                                                        λ {z'} → e {inr (inl z')}) ,
+                                                                                                       f))
                 g (_ , _ , _ , exists (inr (inr _)) ((_ , () , _) , _))
 
         
