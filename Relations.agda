@@ -66,11 +66,14 @@ Total _~_ = ∀ {x y} → (x ~ y) ∨ (y ~ x)
 Trichotomous : ∀ {ℓ} {X : Set ℓ} → Rel X ℓ → Set _
 Trichotomous _~_ = ∀ {x y} → x ~ y ⊕ y ~ x ⊕ x == y
 
-Rooted : ∀ {ℓ} {X : Set ℓ}
-         → X
-         → Rel X ℓ
-         → Set ℓ
+Rooted : ∀ {ℓ} {X : Set ℓ} → X → Rel X ℓ → Set ℓ
 Rooted {_} {X} r _<_ = ∀ {x : X} → r == x ∨ r < x
+
+ObsEquivalent : ∀ {ℓ} {X Y : Set ℓ}
+                → REL X Y ℓ
+                → REL X Y ℓ
+                → Set ℓ
+ObsEquivalent {_} {X} {Y} _~_ _~′_ = ∀ {x : X} {y : Y} → x ~ y ↔ x ~′ y
 
 _⇒_ : ∀ {ℓ} {X Y : Set ℓ} → REL X Y ℓ → REL X Y ℓ → Set _
 p ⇒ q = ∀ {x y} → p x y → q x y

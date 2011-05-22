@@ -11,6 +11,17 @@ module CCommandLemmas where
 
 
 
+lem-cc-uniqueness : ∀ {ℓ} {t : SingleDominanceTree ℓ}
+                    → (_cc_ : Rel (SingleDominanceTree.carrier t) ℓ)
+                    → IsCCommandRel t _cc_
+                    → (_cc′_ : Rel (SingleDominanceTree.carrier t) ℓ)
+                    → IsCCommandRel t _cc′_
+                    → ObsEquivalent _cc_ _cc′_
+lem-cc-uniqueness _cc_ p0 _cc′_ p1 {x} {y} = (snd (p1 {x} {y}) ∘′ fst p0 ,
+                                              snd (p0 {x} {y}) ∘′ fst p1)
+
+
+
 comb : ∀ {ℓ} {X Y : Set ℓ}
        → Rel X ℓ
        → Rel Y ℓ

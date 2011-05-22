@@ -39,10 +39,6 @@ flip f x y = f y x
 
 infixr 11 _×_
 infixr 0 _,_
-{-
-data _×_ {n} (X Y : Set n) : Set n where
-  _,_ : X → Y → X × Y
--}
 record _×_ {n} (X Y : Set n) : Set n where
   constructor _,_
   field

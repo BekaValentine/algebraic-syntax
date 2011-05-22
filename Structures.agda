@@ -13,7 +13,6 @@ record One {n} : Set n where
   constructor *
 
 
-
 record Digraph ℓ : Set (suc ℓ) where
   constructor digraph
   field
