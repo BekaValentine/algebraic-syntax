@@ -1,72 +1,192 @@
-open import Naturals
-open import Functions
-open import Logic
-open import Relations
+{-# OPTIONS --universe-polymorphism #-}
+
+open import Data.Empty
+open import Data.Fin
+open import Data.Nat
+open import Data.Product
+open import Data.Unit
+open import Data.Vec
+open import Function
+open import Relation.Binary.Core
 
 module Map where
 
 
 
 
-data Vec (X : Set) : ℕ → Set where
-  nil : Vec X zero
-  _::_ : ∀ {n} → X → Vec X n → Vec X (suc n)
+case : ∀ {X Y : Set} {n : ℕ}
+      → Vec X n
+      → Y
+      → (∀ {n} → X → Vec X n → Y)
+      → Y
+case [] z f = z
+case (x ∷ xs) z f = f x xs
 
-data Fin : ℕ → Set where
-  fzero : ∀ {n} → Fin (suc n)
-  fsuc : ∀ {n} → Fin n → Fin (suc n)
 
-proj : ∀ {X n} → Vec X n → Fin n → X
-proj nil ()
-proj (x :: _) fzero = x
-proj (x :: xs) (fsuc i) = proj xs i
+infixr 9 _↔_
+_↔_ : ∀ {n} → Set n → Set n → Set n
+X ↔ Y = (X → Y) × (Y → X)
 
-map-theorem : ∃ (∀ {X Y n}
-                 → (X → Y → Set) → Vec X n → Vec Y n
-                 → Set)
-                (λ map → (X Y : Set) (n : ℕ) (f : X → Y → Set) (xs : Vec X n) (ys : Vec Y n)
-                       → map f xs ys ↔ ((i : Fin n) → f (proj xs i) (proj ys i)))
-map-theorem = exists (λ {X} {Y} {n} → map {X} {Y} {n}) p
-  where map : ∀ {X Y n}
-              → (f : X → Y → Set) → (xs : Vec X n) → (ys : Vec Y n)
-              → Set
-        map f nil nil = ⊤
-        map f (x :: xs) (y :: ys) = f x y ∧ map f xs ys
+infixr 9 _≅_
+_≅_ : ∀ {n} → Set n → Set n → Set n
+X ≅ Y = Σ[ f ∶ (X → Y) ]
+         (Σ[ b ∶ (Y → X) ]
+           (∀ x → x ≡ b (f x)) × (∀ y → y ≡ f (b y)))
+
+-- A stupid derivation
+
+nil : ∀ {X : Set} {n : ℕ} → Vec X n → Set
+nil [] = ⊤
+nil (x ∷ xs) = ⊥
+
+empty-theorem : Σ[ empty ∶ (∀ {X : Set} {n : ℕ} → Vec X n → Set) ]
+                 ((X : Set) (n : ℕ) (xs : Vec X n)
+                  → nil xs ↔ empty xs)
+empty-theorem = (λ {X} {n} → empty {X} {n}) , p
+  where empty : ∀ {X : Set} {n : ℕ} → Vec X n → Set
+        empty [] = ⊤
+        empty (x ∷ xs) = ⊥
         
-        p : (X Y : Set) (n : ℕ) (f : X → Y → Set) (xs : Vec X n) (ys : Vec Y n) → map f xs ys ↔ ((i : Fin n) → f (proj xs i) (proj ys i))
-        p X Y zero f nil nil = nnl , nnr
-          where nnl : map f nil nil → (i : Fin zero) → f (proj nil i) (proj nil i)
-                nnl mfnn ()
-                  where g : (i : Fin zero) → f (proj nil i) (proj nil i) 
-                        g ()
-                        -- Here we can see that the type (i : Fin zero) → f (proj nil i) (proj nil i)
-                        -- is actually inhabited, namely, by the empty function
+        p : (X : Set) (n : ℕ) (xs : Vec X n)
+            → nil xs ↔ empty xs
+        p X zero [] = pl , pr
+          where pl : nil {X} [] → empty {X} []
+                pl n[] = n[]
+                -- need an empty [] but all we have is a nil []
+                -- however, empty [] is as of yet undefined
+                -- so define it to be the same as nil []: ⊤
                 
-                nnr : ((i : Fin zero) → f (proj nil i) (proj nil i)) → map f nil nil
+                pr : empty {X} [] → nil {X} []
+                pr e[] = e[]
+                -- having defined empty [] to be ⊤
+                -- we can give a nil [] == ⊤ by giving back
+                -- the empty [] argument
+        
+        p X (suc n) (x ∷ xs) = pl , pr
+          where pl : nil {X} (x ∷ xs) → empty {X} (x ∷ xs)
+                pl n∷ = n∷
+                -- we need some empty (x ∷ xs) but all we have
+                -- is a nil (x ∷ xs). empty (x ∷ xs) is currently undefined
+                -- however, so define it to be the same as nil (x ∷ xs)
+                -- and return n∷
+                
+                pr : empty {X} (x ∷ xs) → nil {X} (x ∷ xs)
+                pr e∷ = e∷
+                -- similarly we return e∷
+-- Note that the structure of this derivation allows us to simplify greatly:
+--   empty-theorem = _ , λ _ _ _ → id , id
+-- the definition of empty follows inexorably from the proof, and so can be deduced!
+-- however, without a better understanding of this kind of derivation,
+-- this is not possible in general. the best we can do so far is have (_ , p)-like witnesses
+
+empty : ∀ {X : Set} {n : ℕ} → Vec X n → Set
+empty = proj₁ empty-theorem
+
+
+
+
+mapR-theorem : Σ[ mapR ∶ (∀ {X Y : Set} {n : ℕ}
+                          → (X → Y → Set)
+                          → Vec X n → Vec Y n → Set) ]
+                 ((X Y : Set) (n : ℕ) (f : X → Y → Set) (xs : Vec X n) (ys : Vec Y n)
+                    → mapR f xs ys ↔ (∀ i → f (lookup i xs) (lookup i ys)))
+mapR-theorem = _ , p
+  where mapR : ∀ {X Y : Set} {n : ℕ}
+               → (X → Y → Set)
+               → (xs : Vec X n) → (ys : Vec Y n) → Set
+        mapR f [] [] = ⊤
+        mapR f (x ∷ xs) (y ∷ ys) = f x y × mapR f xs ys
+        
+        p : (X Y : Set) (n : ℕ) (f : X → Y → Set) (xs : Vec X n) (ys : Vec Y n)
+            → mapR f xs ys ↔ ((i : Fin n) → f (lookup i xs) (lookup i ys))
+        p _ _ zero f [] [] = nnl , nnr
+          where nnl : mapR f [] [] → (i : Fin zero) → f (lookup i []) (lookup i [])
+                nnl mfnn = λ ()
+                -- Here we can see that the type ∀ i → f (lookup i []) (lookup i [])
+                -- is actually inhabited, namely, only by the empty function
+                -- and thus is ≅ ⊤
+                
+                nnr : ((i : Fin zero) → f (lookup i []) (lookup i [])) → mapR f [] []
                 nnr g = tt
-                -- since (i : Fin zero) → f (proj nil i) (proj nil i) is inhabited,
-                -- we must be able to give a definition for nnr that is non-empty
+                -- since ∀ i → f (lookup i []) (lookup i []) ≅ ⊤
+                -- and since functions are total, mapR f [] [] ≅ ⊤
+                -- and we must be able to give a definition for nnr that is non-empty
                 -- but what to choose as a return value?
-                -- well, map f nil nil is as of yet unspecified
-                -- so lets choose the simplest type with with proofs: ⊤
+                -- well, map f [] [] is as of yet unspecified
+                -- so lets choose the simplest type ≅ ⊤: ⊤
                 
-        p X Y (suc n) f (x :: xs) (y :: ys) = ccl , ccr
-          where ccl : map f (x :: xs) (y :: ys) → (i : Fin (suc n)) → f (proj (x :: xs) i) (proj (y :: ys) i)
-                ccl (fxy , _) fzero = fxy
-                -- need a proof of f x y, and we have an as of yet unspecified type map f (x :: xs) (y :: ys)
-                -- so lets choose a definition of map f (x :: xs) (y :: ys) that gives us what we need
+        p X Y (suc n) f (x ∷ xs) (y ∷ ys) = ccl , ccr
+          where ccl : mapR f (x ∷ xs) (y ∷ ys) → (i : Fin (suc n)) → f (lookup i (x ∷ xs)) (lookup i (y ∷ ys))
+                ccl pr zero = proj₁ pr
+                -- need a proof of f x y, and we have an as of yet unspecified type map f (x ∷ xs) (y ∷ ys)
+                -- so lets choose a definition of map f (x ∷ xs) (y ∷ ys) that gives us what we need
                 -- at least partially: we'll make it a pair so that we have more info for the second case of ccl
                 
-                ccl (fxy , r) (fsuc i) = fst (p X Y n f xs ys) r i
+                ccl pr (suc i) = proj₁ (p X Y n f xs ys) (proj₂ pr) i
                 -- we can use recursively generate the needed proof
                 -- where r is, we needed a map f xs ys, and we have
                 -- a partially unspecified type: the second half of map!
                 
-                ccr : ((i : Fin (suc n)) → f (proj (x :: xs) i) (proj (y :: ys) i)) → map f (x :: xs) (y :: ys)
-                ccr g = g fzero , snd (p X Y n f xs ys) (λ i′ → g (fsuc i′))
+                ccr : ((i : Fin (suc n)) → f (lookup i (x ∷ xs)) (lookup i (y ∷ ys))) → mapR f (x ∷ xs) (y ∷ ys)
+                ccr g = g zero , proj₂ (p X Y n f xs ys) (λ i′ → g (suc i′))
                 -- again recursively generate the needed proof
 
-map : ∀ {X Y n}
-      → (f : X → Y → Set) → (xs : Vec X n) → (ys : Vec Y n)
-      → Set
-map = ∃-witness map-theorem
+mapR : ∀ {X Y : Set} {n : ℕ}
+      → (X → Y → Set)
+      → (xs : Vec X n) → (ys : Vec Y n) → Set
+mapR = proj₁ mapR-theorem
+
+
+
+{-
+  given that
+  
+    P empty = (X : Set) → (n : ℕ) → (xs : Vec X n) → nil xs ↔ empty xs
+  
+  notice that the type of nil and the type of empty are the same
+  hence what we're saying is that nil ⇔ empty
+
+  for mapR:
+
+    P mapR = (X Y : Set) (n : ℕ) (f : X → Y → Set) (xs : Vec X n) (ys : Vec Y n)
+             → mapR f xs ys ↔ (∀ i → f (lookup i xs) (lookup i ys))
+    p : P mapR
+    
+  what is the F such that
+    
+    P mapR == (X Y : Set) (n : ℕ) (f : X → Y → Set) (xs : Vec X n) (ys : Vec Y n)
+              → mapR f xs ys ↔ F f xs ys
+  
+  Obviously just:
+
+    F : (X → Y → Set) → (xs : Vec X n) → (ys : Vec Y n) → Set
+    F f xs ys = ∀ i → f (lookup i xs) (lookup i ys)
+
+  but consider the cases of F:
+
+    F f [] [] = ∀ (i : Fin zero) → f (lookup i []) (lookup i [])
+  
+  but Fin zero ≅ ⊥, so the only inhabitant is
+  
+    g : F f [] [] = ∀ (i : Fin zero) → f (lookup i []) (lookup i [])
+    g ()
+
+  since there's an inhabitant, the corresponding mapR case must be provable
+  so it must have a non-empty type, so we can choose a type that's trivial to prove: ⊤
+  
+  now consider
+
+    F f (x ∷ xs) (y ∷ ys) = ∀ (i : Fin (suc .n)) → f (lookup i (x ∷ xs)) (lookup i (y ∷ ys))
+  
+    h : F f (x ∷ xs) (y ∷ ys) = ∀ (i : Fin (suc .n)) → f (lookup i (x ∷ xs)) (lookup i (y ∷ ys))
+    h zero = {! f (lookup zero (x ∷ xs)) (lookup zero (y ∷ ys)) !}
+           = {! f x y !}
+    h (suc i) = {! f (lookup (suc i) (x ∷ xs)) (lookup (suc i) (y ∷ ys)) !}
+              = {! f (lookup i xs) (lookup i ys) !}1
+  
+  it seems like what we want to be able to say is that empty proof functions map to ⊤
+  and recursive proof functions map to structurally similar recursive functions
+    g = λ () ~> ⊤
+    h = finCase (? : f x y) (? : f (lookup i xs) (lookup i ys)) ~> f x y × mapR f xs ys
+  
+-}
