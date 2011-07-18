@@ -20,7 +20,7 @@ record Digraph ℓ : Set (suc ℓ) where
     edges : Rel carrier ℓ
 
 unit-digraph : ∀ {n} → Digraph n
-unit-digraph = digraph One (const2 ⊥)
+unit-digraph = digraph One (const (const ⊥))
 
 
 IsLinearOrder : ∀ {n} → Digraph n → Set n
@@ -90,6 +90,14 @@ IsCCommandRel (sdtree X r _<_ p _) _cc_ = ∀ {x y : X}
                                             ¬ (x < y) ∧
                                             ¬ (y < x) ∧
                                             ∃ X (λ z → imdom (tree X r _<_ p) z x ∧ z < y)
+
+CCommandRel : ∀ {ℓ} → (t : SingleDominanceTree ℓ) → Set (suc ℓ)
+CCommandRel {ℓ} (sdtree X r _<_ p _) = ∀ (x y : X)
+                                       → ¬ (x == y) ∧
+                                         ¬ (x < y) ∧
+                                         ¬ (y < x) ∧
+                                         ∃ X (λ z → imdom (tree X r _<_ p) z x ∧ z < y)
+                                       → Set ℓ
 
 record CCommandTree ℓ : Set (suc ℓ) where
   constructor cctree

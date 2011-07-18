@@ -83,11 +83,54 @@ empty : ∀ {X : Set} {n : ℕ} → Vec X n → Set
 empty = proj₁ empty-theorem
 
 
+veccase : ∀ {X : Set _} {Y : Set _}
+        → Y
+        → (∀ {n} → X → Vec X n → Y)
+        → ∀ {n} → Vec X n → Y
+veccase z f [] = z
+veccase z f (x ∷ xs) = f x xs
 
+refine : ∀ {m n}
+       → (X : Set m)
+       → (P : X → Set n)
+       → Set _
+refine = Σ
+syntax refine A (λ x → B) = x ∶ A ⟨ B ⟩
+
+vecsplit : ∀ {X : Set _} {Y : Set _}
+         → (P : ∀ {X : Set _} {n} → Vec X n → Y → Set)
+
+         → Σ[ y ∶ Y ]
+              (P {X} [] y)
+
+         → Σ[ f ∶ (∀ {X : Set _} {n} → X → Vec X n → Y) ]
+              (∀ {n} x (xs : Vec X n) → P (x ∷ xs) (f x xs))
+
+         → Σ[ f ∶ (∀ {X : Set _} {n} → Vec X n → Y) ]
+              (∀ {n} (xs : Vec X n) → P xs (f xs))
+
+vecsplit P (fz , pz) (fs , ps) = (λ {X} → veccase {X} fz fs) ,
+                                 (λ {n} → pcomb {n})
+  where pcomb : ∀ {n} (xs : Vec _ n) → P xs (veccase fz fs xs)
+        pcomb [] = pz
+        pcomb (x ∷ xs) = ps x xs
+
+bicond-⊤ : Σ[ X ∶ Set ] (⊤ ↔ X)
+bicond-⊤ = ⊤ , _
+
+--bicond-⊤-vec : Σ[ f ∶ ∀ {X : Set} {n} → Vec X n → Set ] (∀ {n} (
+
+vector : ∀ {X : Set} {n} → Vec X n → Set
+vector _ = ⊤
+
+fp : ∀ {X : Set} → Σ[ f ∶ (∀ {X : Set} {n} → Vec X n → Set) ] (∀ {n} (xs : Vec X n) → vector xs ↔ f xs)
+fp {X} = vecsplit (λ xs fxs → vector xs ↔ fxs)
+                  bicond-⊤
+                  ((λ x x' → ⊤) , (λ x xs → id , id))
 
 mapR-theorem : Σ[ mapR ∶ (∀ {X Y : Set} {n : ℕ}
-                          → (X → Y → Set)
-                          → Vec X n → Vec Y n → Set) ]
+                          → (X → Y → Set)  -- (X × Y → Set)
+                          → Vec X n → Vec Y n → Set) ]  -- (Vec X n × Vec Y n → Set)
                  ((X Y : Set) (n : ℕ) (f : X → Y → Set) (xs : Vec X n) (ys : Vec Y n)
                     → mapR f xs ys ↔ (∀ i → f (lookup i xs) (lookup i ys)))
 mapR-theorem = _ , p

@@ -12,6 +12,7 @@ data ⊤ {n} : Set n where
 
 data ⊥ {n} : Set n where
 
+
 ¬ : ∀ {n} → Set n → Set n
 ¬ {n} A = A → ⊥ {n}
 
@@ -45,7 +46,7 @@ exists′ = exists
 infixr 9 _↔_
 _↔_ : ∀ {n} → Set n → Set n → Set n
 X ↔ Y = (X → Y) ∧ (Y → X)
-
+{-
 data Non-Empty {n} (X : Set n) : Set n where
   non-empty : X → Non-Empty X
 
@@ -54,3 +55,4 @@ ne-witness (non-empty x) = x
 
 Empty : ∀ {n} (X : Set n) → Set n
 Empty X = ¬(Non-Empty X)
+-}

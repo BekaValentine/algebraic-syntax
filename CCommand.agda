@@ -20,9 +20,11 @@ cc-comb : ∀ {ℓ}
           → (sdt1 : SingleDominanceTree ℓ)
           → (_cc′_ : Rel (SingleDominanceTree.carrier sdt1) ℓ)
           → (p1 : IsCCommandRel sdt1 _cc′_)
-          → Rel (SingleDominanceTree.carrier (sdt0 ↑ sdt1)) ℓ
-cc-comb {ℓ} (sdtree X r0 _<_ t0 sd0) _cc_ p0 (sdtree Y r1 _<′_ t1 sd1) _cc′_ p1 = _cc′′_
-  where sdt2 = sdtree X r0 _<_ t0 sd0 ↑ sdtree Y r1 _<′_ t1 sd1
+          → ∃ (Rel (SingleDominanceTree.carrier (sdt0 ↑ sdt1)) ℓ) (λ _cc′′_ → IsCCommandRel (sdt0 ↑ sdt1) _cc′′_)
+cc-comb {ℓ} (sdtree X r0 _<_ t0 sd0) _cc_ p0 (sdtree Y r1 _<′_ t1 sd1) _cc′_ p1 = exists _cc′′_ (λ {x} {y} → p2 {x} {y})
+  where sdt0 = sdtree X r0 _<_ t0 sd0
+        sdt1 = sdtree Y r1 _<′_ t1 sd1
+        sdt2 = sdt0 ↑ sdt1
         open SingleDominanceTree sdt2 using () renaming (_<_ to _<′′_ ; isTree to t2)
         
         rt0 : Rooted r0 _<_
@@ -41,11 +43,11 @@ cc-comb {ℓ} (sdtree X r0 _<_ t0 sd0) _cc_ p0 (sdtree Y r1 _<′_ t1 sd1) _cc�
         inl * cc′′ inr (inl y) = ⊥
         inl * cc′′ inr (inr y) = ⊥
         inr (inl x) cc′′ inl * = ⊥
-        inr (inl x) cc′′ inr (inl y) = {!!}
-        inr (inl x) cc′′ inr (inr y) = {!!}
+        inr (inl x) cc′′ inr (inl y) = x cc y
+        inr (inl x) cc′′ inr (inr y) = x == r0
         inr (inr x) cc′′ inl * = ⊥
-        inr (inr x) cc′′ inr (inl y) = {!!}
-        inr (inr x) cc′′ inr (inr y) = {!!}
+        inr (inr x) cc′′ inr (inl y) = x == r1
+        inr (inr x) cc′′ inr (inr y) = x cc′ y
         
         p2 : IsCCommandRel sdt2 _cc′′_
         p2 {inl *} {inl *} = (f , g)
@@ -114,41 +116,80 @@ cc-comb {ℓ} (sdtree X r0 _<_ t0 sd0) _cc_ p0 (sdtree Y r1 _<′_ t1 sd1) _cc�
                 f ()
         
         p2 {inr (inl x)} {inr (inl y)} = (f , g)
-          where g : ¬ (inr (inl x) == inr (inl y)) ∧
-                    ¬ (inr (inl x) <′′ inr (inl y)) ∧
-                    ¬ (inr (inl y) <′′ inr (inl x)) ∧
-                    ∃ (One + X + Y) (λ z → imdom (tree (One + X + Y) (inl *) _<′′_ t2) z (inr (inl x)) ∧ (z <′′ inr (inl y)))
-                    → inr (inl x) cc′′ inr (inl y)
-                g (neq , a , b , exists (inl *) ((c , d , e) , f)) with rt0 {y}
-                g (neq , a , b , exists (inl *) ((c , d , e) , f)) | h = {!!}
-
---snd (fst rootedness {x})
---  (uneq-+-inl-inr , tt , λ {z} → e {z})
-{-
-                ... | x = {!!} 
-                ... | x==r0 with rt0 {y}
-                g (neq , a , b , exists (inl *) ((c , d , e) , f)) | x==r0 | inl r0==y with neq (cong (inr ∘′ inl) (trans-== x==r0 r0==y))
-                ... | ()
-                g (neq , a , b , exists (inl *) ((c , d , e) , f)) | x==r0 | inr r0<y with a (subst-== {F = λ r0 → r0 < y} r0 x (comm-== x==r0) r0<y)
-                ... | ()-}
-                g (neq , a , b , exists (inr (inl z)) ((c , d , e) , f)) = {!!}
-                                                                           {- snd (p0 {x} {y}) (neq ∘′ cong inr ∘′ cong inl ,
-                                                                                             a , b ,
-                                                                                             exists z ((c ∘′ cong inr ∘′ cong inl ,
-                                                                                                        d ,
-                                                                                                        λ {z'} → e {inr (inl z')}) ,
-                                                                                                       f))
-                                                                           -}
-                g (_ , _ , _ , exists (inr (inr _)) ((_ , () , _) , _))
-                
-                f : inr (inl x) cc′′ inr (inl y)
+          where f : inr (inl x) cc′′ inr (inl y)
                     → ¬ (inr (inl x) == inr (inl y)) ∧
                       ¬ (inr (inl x) <′′ inr (inl y)) ∧
                       ¬ (inr (inl y) <′′ inr (inl x)) ∧
                       ∃ (One + X + Y) (λ z → imdom (tree (One + X + Y) (inl *) _<′′_ t2) z (inr (inl x)) ∧ (z <′′ inr (inl y)))
-                f = {!!}
+                f rlxccrly with fst (p0 {x} {y}) rlxccrly
+                f rlxccrly | (a , b , c , exists d ((e , f , g) , h)) = a ∘′ uncong-+-inr ∘′ uncong-+-inl ,
+                                                                        b ,
+                                                                        c ,
+                                                                        exists (inr (inl d))
+                                                                               ((e ∘′ uncong-+-inl ∘′ uncong-+-inr ,
+                                                                                 f ,
+                                                                                 λ {z} → f0 {z}) ,
+                                                                                h)
+                  where f0 : ∀ {z : One + X + Y}
+                             → comb _<_ _<′_ (inr (inl d)) z × comb _<_ _<′_ z (inr (inl x))
+                             → ⊥
+                        f0 {inl *} (() , _)
+                        f0 {inr (inl z)} a,b with g {z} a,b
+                        f0 {inr (inl z)} a,b | ()
+                        f0 {inr (inr z)} (() , ())
+                
+                g : ¬ (inr (inl x) == inr (inl y)) ∧
+                    ¬ (inr (inl x) <′′ inr (inl y)) ∧
+                    ¬ (inr (inl y) <′′ inr (inl x)) ∧
+                    ∃ (One + X + Y) (λ z → imdom (tree (One + X + Y) (inl *) _<′′_ t2) z (inr (inl x)) ∧ (z <′′ inr (inl y)))
+                    → inr (inl x) cc′′ inr (inl y)
+                g (a , b , c , exists (inl *) ((d , e , f) , g')) with snd (fst (lem-↑-root sdt0 sdt1) {x}) (d , tt , λ {z} → f {z}) | snd (snd (snd t0)) {y}
+                g (a , b , c , exists (inl *) ((d , e , f) , g')) | x==r0 | inl r0==y with a (cong inr (cong inl (trans-== x==r0 r0==y)))
+                g (a , b , c , exists (inl *) ((d , e , f) , g')) | x==r0 | inl r0==y | ()
+                g (a , b , c , exists (inl *) ((d , e , f) , g')) | x==r0 | inr r0<y with b (subst-== {F = λ x' → x' < y} r0 x (comm-== x==r0) r0<y)
+                g (a , b , c , exists (inl *) ((d , e , f) , g')) | x==r0 | inr r0<y | ()
+                g (a , b , c , exists (inr (inl z)) ((d , e , f) , g)) = snd (p0 {x} {y}) (a ∘′ cong inr ∘′ cong inl ,
+                                                                                           b ,
+                                                                                           c ,
+                                                                                           exists z ((d ∘′ cong inr ∘′ cong inl ,
+                                                                                                      e ,
+                                                                                                      λ {z'} → f {inr (inl z')}) ,
+                                                                                                     g))
+                g (_ , _ , _ , exists (inr (inr _)) ((_ , () , _) , _))
         
-        p2 {inr (inl x)} {inr (inr y)} = {!(f , g)!}
+        p2 {inr (inl x)} {inr (inr y)} = {!!}
+        p2 {inr (inr x)} {inl *} = {!!}
+{-        
+        p2 {inr (inl x)} {inr (inr y)} = ({!f!} , g)
+          where g : ¬ (inr (inl x) == inr (inr y)) ∧
+                    ¬ (inr (inl x) <′′ inr (inr y)) ∧
+                    ¬ (inr (inr y) <′′ inr (inl x)) ∧
+                    ∃ (One + X + Y) (λ z → imdom (tree (One + X + Y) (inl *) _<′′_ t2) z (inr (inl x)) ∧ (z <′′ inr (inr y)))
+                    → inr (inl x) cc′′ inr (inr y)
+                g (a , b , c , exists (inl *) ((e , f , g') , h)) = snd (fst (lem-↑-root sdt0 sdt1) {x}) (e , tt , (λ {z} → g' {z}))
+                g (a , b , c , exists (inr (inl _)) (_ , ()))
+                g (a , b , c , exists (inr (inr _)) ((_ , () , _) , _))
+                
+                f : inr (inl x) cc′′ inr (inr y)
+                    →  ¬ (inr {_} {X + Y} (inl x) == inr (inr y)) ∧
+                       ¬ (inr (inl x) <′′ inr (inr y)) ∧
+                       ¬ (inr (inr y) <′′ inr (inl x)) ∧
+                       ∃ (One + X + Y) (λ z → imdom (tree (One + X + Y) (inl *) _<′′_ t2) z (inr (inl x)) ∧ (z <′′ inr (inr y)))
+                f rlx==rry = (uneq-+-inl-inr ∘′ uncong-+-inr ,
+                              id ,
+                              id ,
+                              exists (inl *) ((uneq-+-inl-inr ,
+                                               tt ,
+                                               (λ {z} → f0 {z})) ,
+                                              tt))
+                  where f0 : ∀ {z : One + X + Y}
+                             → comb _<_ _<′_ (inl *) z ∧
+                               comb _<_ _<′_ z (inr (inl x))
+                             → ⊥
+                        f0 {inl *} (() , _)
+                        f0 {inr (inl r)} (_ , b) with snd (snd (fst (fst (lem-↑-root sdt0 sdt1) {x}) rlx==rry)) {inr (inl r)} (tt , b)
+                        f0 {inr (inl _)} (_ , _) | ()
+                        f0 {inr (inr _)} (_ , ())
           
         p2 {inr (inr x)} {inl *} = (f , g)
           where g : ¬ (inr (inr x) == inl *) ∧
@@ -157,7 +198,7 @@ cc-comb {ℓ} (sdtree X r0 _<_ t0 sd0) _cc_ p0 (sdtree Y r1 _<′_ t1 sd1) _cc�
                     ∃ (One + X + Y) (λ z → imdom (tree (One + X + Y) (inl *) _<′′_ t2) z (inr (inr x)) ∧ (z <′′ inl *))
                     → inr (inr x) cc′′ inl *
                 g (a , b , c , exists (inl *) (_ , ()))
-                g (a , b , c , exists (inr rr) (_ , ()))
+                g (a , b , c , exists (inr _) (_ , ()))
                 
                 f : inr (inr x) cc′′ inl *
                     → ¬ (inr (inr x) == inl *) ∧
@@ -166,66 +207,6 @@ cc-comb {ℓ} (sdtree X r0 _<_ t0 sd0) _cc_ p0 (sdtree Y r1 _<′_ t1 sd1) _cc�
                       ∃ (One + X + Y) (λ z → imdom (tree (One + X + Y) (inl *) _<′′_ t2) z (inr (inr x)) ∧ (z <′′ inl *))
                 f ()
                 
-        
+-}
         p2 {inr (inr x)} {inr (inl y)} = {!!}
         p2 {inr (inr x)} {inr (inr y)} = {!!}
-
-
-{-
-
-_cc′′_ : (x y : car) → ∃ (Set ℓ) (λ xccy → xccy ↔
-                       ¬(x <′′ y) ∧
-                       ¬(y <′′ x) ∧
-                       ∃ car (λ z → imdom (tree car _<′′_ t2) z x ∧ z <′′ y))
-
-
-
-(inr (inl x)) cc′′ (inr (inr y)) = exists w ({!!} , g)
-  where w : Set ℓ
-        w = {!!}
-        
-        g : ¬(inr (inl x) <′′ inr (inr y)) ∧
-            ¬(inr (inr y) <′′ inr (inl x)) ∧
-            ∃ car (λ z → imdom (tree car _<′′_ t2) z (inr (inl x)) ∧ (z <′′ inr (inr y)))
-            → w
-        g (a , b , exists (inl *) d) = {!!}
-        g (_ , _ , exists (inr (inl _)) (_ , ()))
-        g (_ , _ , exists (inr (inr _)) ((_ , () , _) , _))
-
-(inr (inr x)) cc′′ (inl *) = exists ⊥ (f , g)
-  where g : ¬(inr (inr x) <′′ inl *) ∧
-            ¬(inl * <′′ inr (inr x)) ∧
-            ∃ car (λ z → imdom (tree car _<′′_ t2) z (inr (inr x)) ∧ (z <′′ inl *))
-            → ⊥
-        g (_ , _ , exists (inl *) (_ , ()))
-        g (_ , _ , exists (inr _) (_ , ()))
-        
-        f : ⊥ → ¬(inr (inr x) <′′ inl *) ∧
-                 ¬(inl * <′′ inr (inr x)) ∧
-                 ∃ car (λ z → imdom (tree car _<′′_ t2) z (inr (inr x)) ∧ (z <′′ inl *))
-        f ()
-
-(inr (inr x)) cc′′ (inr (inl y)) = exists w ({!!} , g)
-  where w : Set ℓ
-        w = {!!}
-        
-        g : ¬(inr (inr x) <′′ inr (inl y)) ∧
-            ¬(inr (inl y) <′′ inr (inr x)) ∧
-            ∃ car (λ z → imdom (tree car _<′′_ t2) z (inr (inr x)) ∧ z <′′ (inr (inl y)))
-            → w
-        g (a , b , exists (inl *) d) = {!!}
-        g (_ , _ , exists (inr (inl _)) ((_ , () , _) , _))
-        g (_ , _ , exists (inr (inr _)) (_ , ()))
-
-(inr (inr x)) cc′′ (inr (inr y)) = exists w ({!!} , g)
-  where w : Set ℓ
-        w = {!!}
-        
-        g : ¬(inr (inr x) <′′ inr (inr y)) ∧
-                  ¬(inr (inr y) <′′ inr (inr x)) ∧
-            ∃ car (λ z → imdom (tree car _<′′_ t2) z (inr (inr x)) ∧ z <′′ (inr (inr y)))
-            → w
-        g (a , b , exists (inl *) d) = {!!}
-        g (a , b , exists (inr (inl z)) (_ , ()))
-        g (a , b , exists (inr (inr z)) d) = {!!}
--}
