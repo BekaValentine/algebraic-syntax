@@ -39,7 +39,7 @@ cc-comb {ℓ} (sdtree X r0 _<_ t0 sd0) _cc_ p0 (sdtree Y r1 _<′_ t1 sd1) _cc�
         rootedness = lem-↑-root (sdtree X r0 _<_ t0 sd0) (sdtree Y r1 _<′_ t1 sd1)
         
         _cc′′_ : Rel (One + X + Y) ℓ
-        inl * cc′′ inl * = ⊥
+        inl * cc′′ inl * = ? --⊥
         inl * cc′′ inr (inl y) = ⊥
         inl * cc′′ inr (inr y) = ⊥
         inr (inl x) cc′′ inl * = ⊥
@@ -56,15 +56,15 @@ cc-comb {ℓ} (sdtree X r0 _<_ t0 sd0) _cc_ p0 (sdtree Y r1 _<′_ t1 sd1) _cc�
                     ¬ (inl * <′′ inl *) ∧
                     ∃ (One + X + Y) (λ z → imdom (tree (One + X + Y) (inl *) _<′′_ t2) z (inl *) ∧ (z <′′ inl *))
                     → inl * cc′′ inl *
-                g (_ , _ , _ , exists (inl *) (_ , ()))
-                g (_ , _ , _ , exists (inr _) (_ , ()))
+                g = ? -- (_ , _ , _ , exists (inl *) (_ , ()))
+                --g (_ , _ , _ , exists (inr _) (_ , ()))
                 
                 f : inl * cc′′ inl *
                     → ¬ (inl * == inl *) ∧ 
                       ¬ (inl * <′′ inl *) ∧
                       ¬ (inl * <′′ inl *) ∧
                       ∃ (One + X + Y) (λ z → imdom (tree (One + X + Y) (inl *) _<′′_ t2) z (inl *) ∧ (z <′′ inl *))
-                f ()
+                f = ? --()
         
         p2 {inl *} {inr (inl y)} = (f , g)
           where g : ¬ (inl * == inr (inl y)) ∧
