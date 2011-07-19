@@ -31,6 +31,8 @@ data _<⁺_ : {t : Tree} → TreeIndex t → TreeIndex t → Set where
       → ¬ i < root
 ¬i<rt ()
 
+
+
 Rel₀ : Set → Set₁
 Rel₀ X = X → X → Set
 
@@ -128,15 +130,27 @@ cc-merge-lemma {l} {r} _cc₀_ _cc₁_ = _cc₂_ , p
                       (¬ left x <⁺ left y) ×
                       (¬ left y <⁺ left x) ×
                       (Σ[ z ∶ (TreeIndex (branch l r)) ] z < left x × z <⁺ left y)
-                fwd = {!!}
+                fwd lxcc₂ly = {!!}
                 
                 bwd : (¬ left x ≡ left y) ×
                       (¬ left x <⁺ left y) ×
                       (¬ left y <⁺ left x) ×
                       (Σ[ z ∶ (TreeIndex (branch l r)) ] z < left x × z <⁺ left y)
                     → left x cc₂ left y
-                bwd (a , b , c , d) with l
-                ... | l' = ?
+                bwd (a , b , c , d) = go (a , b , c , d) l refl x refl y refl
+                  where go : (¬ left x ≡ left y) ×
+                             (¬ left x <⁺ left y) ×
+                             (¬ left y <⁺ left x) ×
+                             (Σ[ z ∶ (TreeIndex (branch l r)) ] z < left x × z <⁺ left y)
+                           → (l′ : Tree)
+                           → l′ ≡ l
+                           → (x′ : TreeIndex l)
+                           → x′ ≡ x
+                           → (y′ : TreeIndex l)
+                           → y′ ≡ y
+                           → left x cc₂ left y
+                        go (a' , b' , c' , d') leaf _ x′ _ y′ _ = {!!}
+                        go (a' , b' , c' , d') (branch l' r') _ x′ _ y′ _ = {!!}
         
         p (left x) (right y) = {!!}
         p (right x) y = {!!}
