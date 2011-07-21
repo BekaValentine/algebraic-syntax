@@ -10,6 +10,7 @@ open import Level
 open import Relation.Binary.Core
 open import Relation.Binary.PropositionalEquality
 open import Relation.Nullary
+open import Relation.Binary.Product.Pointwise
 
 module TreeIndex where
 
@@ -36,11 +37,48 @@ infixr 1 _↔_
 _↔_ : {l : Level} → Set l → Set l → Set l
 X ↔ Y = (X → Y) × (Y → X)
 
-record IsInductionPrinciple {ℓ : Level} (P : Tree → Set ℓ) (F : (t : Tree) → P t) : Set _ where
+_⇔_ : ∀ {a b ℓ₁ ℓ₂} {A : Set a} {B : Set b}
+    → REL A B ℓ₁ → REL A B ℓ₂ → Set _
+P ⇔ Q = (P ⇒ Q) × (Q ⇒ P)
+
+record IsTreeInductionPrincipleRel (F : Tree → Set) (P : (t : Tree) → Rel (F t) zero) : Set₁ where
+  constructor isTreeInductionPrincipleRel
   field
-    baseCase : P leaf
-    recursiveCase : (l r : Tree) → P l → P r → P (branch l r)
-    proof : (t : Tree) → {!!} ↔ treeind {!!} {!!} {!!} {!!}
+    baseCase : Rel (F leaf) zero
+    recursiveCase : (l r : Tree) → Rel (F l) zero → Rel (F r) zero → Rel (F (branch l r)) zero
+    proof : (t : Tree) → P t ⇔ treeind (λ t → Rel (F t) zero) baseCase recursiveCase t
+
+{-
+record TreeInductionPrincipleRel : Set₁ where
+  constructor inductionPrincipleRel
+  field
+    relation : (t : Tree) → Rel (TreeIndex t) zero
+    isInductionPrincipleRel : IsTreeInductionPrincipleRel relation
+-}
+
+×-tree-induction-principle-rel : {F G : Tree → Set}
+                               → (P : (t : Tree) → Rel (F t) zero)
+                               → (IP : IsTreeInductionPrincipleRel F P)
+                               → (Q : (t : Tree) → Rel (G t) zero)
+                               → (IQ : IsTreeInductionPrincipleRel G Q)
+                              → IsTreeInductionPrincipleRel (λ t → F t × G t)
+                                                            (λ t xx' yy'
+                                                             → P t (proj₁ xx') (proj₁ yy') × Q t (proj₂ xx') (proj₂ yy'))
+×-tree-induction-principle-rel {F} {G}
+  P (isTreeInductionPrincipleRel zP fP pP)
+  Q (isTreeInductionPrincipleRel zQ fQ pQ) = isTreeInductionPrincipleRel z f p
+  where z : Rel (F leaf × G leaf) zero
+        z (x , x') (y , y') = zP x y × zQ x' y'
+        
+        f : (l r : Tree)
+          → Rel (F l × G l) zero
+          → Rel (F r × G r) zero
+          → Rel (F (branch l r) × G (branch l r)) zero
+        f l r P' Q' (x , y) (x' , y') = fP l r {!!} {!!} x x'
+                                      × fQ l r {!!} {!!} y y'
+        
+        p : _
+        p = {!!}
 
 {-
 IsInductionPrinciple P F = Σ[ z ∶ P leaf ]
