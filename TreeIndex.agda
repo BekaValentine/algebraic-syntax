@@ -36,17 +36,20 @@ infixr 1 _↔_
 _↔_ : {l : Level} → Set l → Set l → Set l
 X ↔ Y = (X → Y) × (Y → X)
 
-IsInductionPrinciple : {ℓ : Level}
-                     → (P : Tree → Set ℓ)
-                     → (F : (t : Tree) → P t)
-                     → Set _
+record IsInductionPrinciple {ℓ : Level} (P : Tree → Set ℓ) (F : (t : Tree) → P t) : Set _ where
+  field
+    baseCase : P leaf
+    recursiveCase : (l r : Tree) → P l → P r → P (branch l r)
+    proof : (t : Tree) → {!!} ↔ treeind {!!} {!!} {!!} {!!}
+
+{-
 IsInductionPrinciple P F = Σ[ z ∶ P leaf ]
                               Σ[ f ∶ ((l r : Tree)
                                    → P l
                                    → P r
                                    → P (branch l r)) ]
-                                 ((t : Tree) → {!!} t ↔ treeind {!!} {!!} {!!} t)
-
+                                 ((t : Tree) → F t ↔ treeind P z f t)
+-}
 {-
 data _<_ : {t : Tree} → TreeIndex t → TreeIndex t → Set where
   <-ze-l : {l r : Tree} → _<_ {branch l r} root (left root)
