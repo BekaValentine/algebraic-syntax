@@ -1,9 +1,9 @@
 open import Level
 
-open import Syntax.Functor2.Core
+open import Functor2.Core
 open import Syntax.Inclusiveness.Core
 
-module Syntax.Functor2.InclusionPreserving.Core where
+module Functor2.InclusionPreserving.Core where
 
 
 

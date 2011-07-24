@@ -5,7 +5,7 @@ open import Function
 open import Level
 open import Relation.Binary.PropositionalEquality
 
-module Syntax.Functor2.Core where
+module Functor2.Core where
 
 
 

@@ -2,9 +2,9 @@ open import Data.Product
 open import Level
 open import Relation.Binary.PropositionalEquality
 
-open import Syntax.Functor2.Core
+open import Functor2.Core
 
-module Syntax.Functor2.Product where
+module Functor2.Product where
 
 ×-Bifunctor : Bifunctor {zero}
 ×-Bifunctor = record { _*_ = _×_

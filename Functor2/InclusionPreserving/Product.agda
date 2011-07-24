@@ -1,10 +1,10 @@
 open import Data.Product
 
-open import Syntax.Functor2.Product
-open import Syntax.Functor2.InclusionPreserving.Core
+open import Functor2.Product
+open import Functor2.InclusionPreserving.Core
 open import Syntax.Inclusiveness.Core
 
-module Syntax.Functor2.InclusionPreserving.Product where
+module Functor2.InclusionPreserving.Product where
 
 ×-InclusionPreservingBifunctor : InclusionPreservingBifunctor
 ×-InclusionPreservingBifunctor = record { underlying = ×-Bifunctor

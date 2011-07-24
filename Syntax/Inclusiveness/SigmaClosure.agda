@@ -3,8 +3,8 @@ open import Data.Sum
 open import Function
 
 open import Syntax.Derivationality
-open import Syntax.Functor2.Core
-open import Syntax.Functor2.InclusionPreserving.Core
+open import Functor2.Core
+open import Functor2.InclusionPreserving.Core
 open import Syntax.Inclusiveness.Core
 open import Syntax.Logic
 open import Syntax.TreeIndex
