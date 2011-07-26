@@ -46,7 +46,7 @@ IsDerivationalRelation _~_ ind = (t : TreeShape) → _~_ {t} ⇔′ Deriver._~~_
 
 
 record DerivationalRelation : Set₁ where
-  constructor derivedRelation
+  constructor derivationalRelation
   field
     _~_ : {t : TreeShape} → Rel (TreeIndex t) zero
     ind : Deriver

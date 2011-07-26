@@ -26,7 +26,7 @@ record InclusiveRelation : Set₁ where
 
 
 record InclusiveDerivationalRelation : Set₁ where
-  constructor derivationalRelation
+  constructor inclusiveDerivationalRelation
   field
     indr : DerivationalRelation
     isInclusiveRelation : IsInclusiveRelation (DerivationalRelation._~_ indr)
